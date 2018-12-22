@@ -38,7 +38,7 @@ def validate_inputs(config, args):
             ptts.dl_path = ptts.dl_path + '/'
         if not ptts.dl_path or not os.path.exists(ptts.dl_path):
             ptts.dl_path = os.getcwd()
-            error_arr.append("dl_path", ptts.dl_path)
+            error_arr.append(["dl_path", ptts.dl_path])
 
         if error_arr:
             for error in error_arr:
