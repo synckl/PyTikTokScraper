@@ -14,6 +14,9 @@ except ImportError:
 def login(username, password):
     username = helpers.xor(username)
     password = helpers.xor(password)
+    
+    if not os.path.exists(ptts.cookies_path):
+        os.makedirs(ptts.cookies_path)
 
     cookie_path = os.path.join(ptts.cookies_path, username + ".json")
     if os.path.isfile(cookie_path):

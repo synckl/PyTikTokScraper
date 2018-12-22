@@ -16,6 +16,6 @@ def initialize():
     tt_password = None
     tt_target_user = None
     tt_active_user = {}
-    dl_path = None
+    dl_path = os.getcwd()
     cookies_path = os.path.join(os.getcwd(), 'cookies')
     args = None
