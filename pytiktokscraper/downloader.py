@@ -39,11 +39,11 @@ def download_all(target_user_id):
             max_cursor = json_data.get('max_cursor')
             has_more = json_data.get('has_more')
             if not json_data.get("aweme_list", None):
-                if downloaded_total:
+                if checked_total:
                     logger.separator()
                     logger.info("End of feed reached. {:d} {:s} been downloaded.".format(
                         downloaded_total, "video has" if downloaded_total == 1 else "videos have"))
-                else:
+                elif not checked_total:
                     logger.info("There are no available videos to download.")
                 logger.separator()
                 break
@@ -128,7 +128,7 @@ def download_all(target_user_id):
         logger.separator()
         logger.error("Something went wrong: " + str(e))
         logger.separator()
-        
+
 
 def download_single(video_id):
     try:
