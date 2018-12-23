@@ -9,7 +9,7 @@ class Constants:
     """""
     BASE_URL = "https://api2.musical.ly/"
     VIDEO_BASE_URL = "https://api2.musical.ly/aweme/v1/play/?video_id={" \
-                     ":s}&line=1&ratio=540p&media_type=4&vr_type=0&test_cdn=None&improve_bitrate=1 "
+                     ":s}&line=1&ratio=540p&media_type=4&vr_type=0&test_cdn=None&improve_bitrate={:d}"
     LOGIN_ENDP = "passport/user/login/?"
     FEED_ENDP = "aweme/v1/feed/?count=20&offset=0&max_cursor=0&type=0&is_cold_start=1&pull_type=1&"
     DISCOVER_ENDP = "aweme/v1/discover/search/?cursor=0&keyword={:s}&count=10&type=1&hot_search=0&"
