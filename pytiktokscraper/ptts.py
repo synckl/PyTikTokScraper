@@ -1,4 +1,10 @@
 import os
+import time
+try:
+    import helpers
+except ImportError:
+    from . import helpers
+
 
 def noinit(self):
     pass
@@ -13,6 +19,7 @@ def initialize():
     global dl_path
     global cookies_path
     global args
+    global epochtime
     tt_username = None
     tt_password = None
     tt_target_user = None
@@ -21,3 +28,4 @@ def initialize():
     dl_path = os.getcwd()
     cookies_path = os.path.join(os.getcwd(), 'cookies')
     args = None
+    epochtime = str(time.time())

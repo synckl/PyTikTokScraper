@@ -73,3 +73,9 @@ def user_post_feed(user_id, max_cursor=0):
     request_url = Constants.BASE_URL + Constants.USER_POST_FEED.format(user_id, max_cursor) + helpers.query(Constants.DEVICE_VARS)
     request_response = helpers.make_request(request_url, request_type="get")
     return request_response.json()
+
+
+def get_live_feed(live_room_id):
+    request_url = Constants.BASE_URL + Constants.LIVE_ROOM_ENDP.format(live_room_id) + helpers.query(Constants.DEVICE_VARS)
+    request_response = helpers.make_request(request_url, request_type="get")
+    return request_response.json()

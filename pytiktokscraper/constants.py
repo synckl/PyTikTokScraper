@@ -19,6 +19,10 @@ class Constants:
     USER_INFO_ENDP = "aweme/v1/user/?user_id={:d}&"
     USER_POST_FEED = "aweme/v1/aweme/post/?user_id={:s}&type=0&count=20&pull_type=1&max_cursor={:d}&"
 
+    LIVE_ROOM_ENDP = 'aweme/v1/room/enter/?room_id={:d}&'
+    LIVE_FLV_ENDP = 'http://pull-flv-l1-mus.pstatp.com/hudong/stream-{}.flv'
+    LIVE_HLS_ENDP = 'http://pull-hls-l1-mus.pstatp.com/hudong/stream-{}/playlist.m3u8'
+
     """
     We'll just keep these constants here for the sake of tidiness
     """

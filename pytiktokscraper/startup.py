@@ -2,6 +2,7 @@ import argparse
 import configparser
 import logging
 import os
+import sys
 
 try:
     import ptts
@@ -47,6 +48,8 @@ def validate_inputs(config, args):
 
         if args.download:
             ptts.tt_target_user = args.download
+        elif args.livestream:
+            ptts.tt_target_user = args.livestream
         elif args.single:
             ptts.tt_target_id = args.single
         else:
@@ -75,24 +78,34 @@ def run():
                         help="When used, only retrieves the first 10 videos in the user's feed.")
     parser.add_argument('-s', '--single', dest='single', type=str, required=False,
                         help="Pass a single video Id to download.")
+    parser.add_argument('-l', '--livestream', dest='livestream', type=str, required=False,
+                        help="Pass an username to download a livestream, if available.")
     args = parser.parse_args()
 
     if validate_inputs(config, args):
         api.login(username=ptts.tt_username, password=ptts.tt_password)
         if ptts.tt_active_user:
-            if ptts.tt_target_user:
-                logger.info("Login successful.")
-                logger.separator()
-                logger.info("Getting user information for '{:s}'.".format(ptts.tt_target_user))
-
-                target_user_json = api.search_user(ptts.tt_target_user)
-                target_user_id = target_user_json.get('user_list')[0].get('user_info').get('uid')
-
+            logger.info("Login successful.")
+            logger.separator()
+            logger.info("Getting user information for '{:s}'.".format(ptts.tt_target_user))
+            target_user_json = api.search_user(ptts.tt_target_user)
+            target_user_id = target_user_json.get('user_list')[0].get('user_info').get('uid')
+            if target_user_id:
                 logger.separator()
                 logger.info("Retrieved user ID: {:s}".format(target_user_id))
                 logger.separator()
+            else:
+                logger.separator()
+                logger.warn("No user ID found. Exiting.")
+                logger.separator()
+                sys.exit(1)
+
+            if ptts.args.download:
                 logger.info("Starting download of all videos from profile.")
                 downloader.download_all(target_user_id)
-            elif ptts.tt_target_id:
-                logger.info("Downloading single video by id. No authentication required.")
+            elif ptts.args.single:
+                logger.info("Starting download of single video by id.")
                 downloader.download_single(ptts.tt_target_id)
+            elif ptts.args.livestream:
+                logger.info("Starting download for livestream.")
+                downloader.download_live(target_user_id)

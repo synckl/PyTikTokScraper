@@ -1,16 +1,19 @@
 import requests
 import os
 import json
+import sys
 
 try:
     import ptts
     import logger
     import api
+    import helpers
     from constants import Constants
 except ImportError:
     from . import ptts
     from . import api
     from . import logger
+    from . import helpers
     from .constants import Constants
 
 
@@ -159,4 +162,30 @@ def download_single(video_id):
     except Exception as e:
         logger.separator()
         logger.error("Something went wrong: " + str(e))
+        logger.separator()
+
+
+def download_live(target_user_id):
+    if not os.path.exists(os.path.join(ptts.dl_path, ptts.tt_target_user, 'broadcasts')):
+        os.makedirs(os.path.join(ptts.dl_path, ptts.tt_target_user, 'broadcasts'))
+
+    download_path = os.path.join(ptts.dl_path, ptts.tt_target_user, 'broadcasts')
+    logger.separator()
+    logger.info("Checking for ongoing livestreams.")
+    logger.separator()
+    json_data = api.user_post_feed(user_id=target_user_id, max_cursor=0)
+    if  json_data.get("aweme_list"):
+        live_room_id = json_data.get("aweme_list")[0].get('author', None).get('room_id', None)
+        if live_room_id:
+            logger.info("Livestream available, getting information and beginning download.")
+            logger.separator()
+            live_json = api.get_live_feed(live_room_id)
+            live_hls_url = Constants.LIVE_HLS_ENDP.format(live_json.get('room').get('stream_url').get('sid'))
+            logger.info("HLS url retrieved. Calling youtube-dl.")
+            helpers.call_ytdl(live_hls_url, os.path.join(download_path, str(live_room_id) + "_" + ptts.epochtime))
+        else:
+            logger.info("There is no available livestream for this user.")
+            logger.separator()
+    else:
+        logger.info("There is no available livestream for this user.")
         logger.separator()

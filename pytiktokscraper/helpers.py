@@ -1,12 +1,19 @@
 import time
 from urllib import parse
 import requests
-import json
+import subprocess
+import os
 
 try:
     import ptts
+    import logger
+    import helpers
+    from constants import Constants
 except ImportError:
     from . import ptts
+    from . import helpers
+    from . import logger
+    from .constants import Constants
 
 def strdatetime():
     return time.strftime('%m-%d-%Y %I:%M:%S %p')
@@ -18,6 +25,24 @@ def strtime():
 
 def strdate():
     return time.strftime('%m-%d-%Y')
+
+
+def call_ytdl(url, filename):
+    try:
+        subprocess.call('youtube-dl -o "{}.mp4" "{}"'.format(filename, url), shell=True)
+        return True
+    except Exception as e:
+        logger.separator()
+        logger.error("Something went wrong: " + str(e))
+        logger.separator()
+        if os.path.isfile(filename + '.mp4.part'):
+            os.rename(filename + '.mp4.part', filename + '.mp4')
+    except KeyboardInterrupt:
+        logger.separator()
+        logger.info("The download has been aborted.")
+        if os.path.isfile(filename + '.mp4.part'):
+            os.rename(filename + '.mp4.part', filename + '.mp4')
+        logger.separator()
 
 
 def xor(input, key=5):
