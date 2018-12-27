@@ -1,7 +1,6 @@
 import requests
 import os
-import json
-import sys
+from mutagen.mp4 import MP4
 
 try:
     import ptts
@@ -65,6 +64,7 @@ def download_all(target_user_id):
                         return
                     else:
                         video_uri = video.get("video").get("play_addr").get("uri")
+                        video_desc = video.get("desc")
                         filename = str(video.get("create_time")) + ".mp4"
                         if video_uri.isdigit():
                             actual_video_uri = video.get("video").get("play_addr").get("url_list")[0]
@@ -74,6 +74,12 @@ def download_all(target_user_id):
                                                   headers={"User-Agent": Constants.REQUESTS_UA["User-Agent"]})
                                 if rr.status_code == 200:
                                     open(os.path.join(download_path, filename), 'wb').write(rr.content)
+                                    try:
+                                        mp4_video_tags = MP4(os.path.join(download_path, filename))
+                                        mp4_video_tags['\xa9cmt'] = video_desc
+                                        mp4_video_tags.save()
+                                    except Exception as e:
+                                        pass
                                     logger.info(
                                         "({:d}/{:d}) - Downloaded video with Id: {}".format(checked_total + 1,
                                                                                             available_total,
@@ -93,6 +99,12 @@ def download_all(target_user_id):
                                                   headers={"User-Agent": Constants.REQUESTS_UA["User-Agent"]})
                                 if rr.status_code == 200:
                                     open(os.path.join(download_path, filename), 'wb').write(rr.content)
+                                    try:
+                                        mp4_video_tags = MP4(os.path.join(download_path, filename))
+                                        mp4_video_tags['\xa9cmt'] = video_desc
+                                        mp4_video_tags.save()
+                                    except Exception as e:
+                                        pass
                                     logger.info(
                                         "({:d}/{:d}) - Downloaded video with Id: {}".format(checked_total + 1,
                                                                                             available_total,
