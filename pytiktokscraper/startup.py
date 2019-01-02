@@ -73,9 +73,11 @@ def run():
         description="You are running PyTikTokScraper {:s} using Python {:s}".format(Constants.SCRIPT_VER,
                                                                                     Constants.PYTHON_VER))
     parser.add_argument('-d', '--download', dest='download', type=str, required=False,
-                        help="The username of the user whose posts you want to save.")
+                        help="The username (or uid) of the user whose posts you want to save.")
     parser.add_argument('-r', '--recent', dest='recent', action='store_true',
                         help="When used, only retrieves the first 10 videos in the user's feed.")
+    parser.add_argument('-uid', '--is-uid', dest='isuid', action='store_true',
+                        help="When used, treat the download argument as the user ID.")
     parser.add_argument('-s', '--single', dest='single', type=str, required=False,
                         help="Pass a single video Id to download.")
     parser.add_argument('-l', '--livestream', dest='livestream', type=str, required=False,
@@ -88,8 +90,17 @@ def run():
             logger.info("Login successful.")
             logger.separator()
             logger.info("Getting user information for '{:s}'.".format(ptts.tt_target_user))
-            target_user_json = api.search_user(ptts.tt_target_user)
-            target_user_id = target_user_json.get('user_list')[0].get('user_info').get('uid')
+            if not args.isuid:
+                try:
+                    target_user_json = api.search_user(ptts.tt_target_user)
+                    target_user_id = target_user_json.get('user_list')[0].get('user_info').get('uid')
+                except IndexError as e:
+                    logger.separator()
+                    logger.error("No user found matching '{:s}', the script will now exit.".format(ptts.tt_target_user))
+                    logger.separator()
+                    sys.exit(1)
+            else:
+                target_user_id = args.download
             if target_user_id:
                 logger.separator()
                 logger.info("Retrieved user ID: {:s}".format(target_user_id))
