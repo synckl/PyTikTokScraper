@@ -17,7 +17,8 @@ class Constants:
     FOLLOW_STATUS_ENDP = "aweme/v1/commit/follow/user/?user_id={:s}&type={:d}&retry_type=no_retry&from=3&"
     POST_INFO_ENDP = "aweme/v1/aweme/stats/?"
     USER_INFO_ENDP = "aweme/v1/user/?user_id={:d}&"
-    USER_POST_FEED = "aweme/v1/aweme/post/?user_id={:s}&type=0&count=20&pull_type=1&max_cursor={:d}&"
+    USER_POST_FEED_ENDP = "aweme/v1/aweme/post/?user_id={:s}&type=0&count=20&pull_type=1&max_cursor={:d}&"
+    USER_FOLLOWING_FNDP = "aweme/v1/user/following/list/?user_id={:s}&offset=0&count=1000&max_time=" + str(int(time.time())) + "&source_type=2&"
 
     LIVE_ROOM_ENDP = 'aweme/v1/room/enter/?room_id={:d}&'
     LIVE_FLV_ENDP = 'http://pull-flv-l1-mus.pstatp.com/hudong/stream-{}.flv'

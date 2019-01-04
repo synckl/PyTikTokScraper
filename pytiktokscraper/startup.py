@@ -3,6 +3,7 @@ import configparser
 import logging
 import os
 import sys
+import json
 
 try:
     import ptts
@@ -48,6 +49,8 @@ def validate_inputs(config, args):
 
         if args.download:
             ptts.tt_target_user = args.download
+        elif args.getfollowing:
+            ptts.tt_target_user = args.getfollowing
         elif args.livestream:
             ptts.tt_target_user = args.livestream
         elif args.single:
@@ -76,6 +79,8 @@ def run():
                         help="The username (or uid) of the user whose posts you want to save.")
     parser.add_argument('-r', '--recent', dest='recent', action='store_true',
                         help="When used, only retrieves the first 10 videos in the user's feed.")
+    parser.add_argument('-gf', '--get-following', dest='getfollowing', type=str, required=False,
+                        help="When used, retrieves the list of people you're following.")
     parser.add_argument('-uid', '--is-uid', dest='isuid', action='store_true',
                         help="When used, treat the download argument as the user ID.")
     parser.add_argument('-s', '--single', dest='single', type=str, required=False,
@@ -110,7 +115,21 @@ def run():
                 logger.warn("No user ID found. Exiting.")
                 logger.separator()
                 sys.exit(1)
-
+            if args.getfollowing:
+                logger.info("Retrieving list of following users...")
+                logger.warn("Pagination does not work properly, use this at own risk!")
+                logger.separator()
+                json_resp = api.get_following(target_user_id)
+                following_txt = os.path.join(os.getcwd(), "following_{:s}.txt".format(ptts.tt_target_user))
+                if os.path.isfile(following_txt):
+                    os.remove(following_txt)
+                for user in json_resp.get('followings'):
+                    user_text = user.get('unique_id') + " - " + user.get('uid')
+                    logger.plain(user_text)
+                    open(following_txt, 'a').write(user_text + '\n')
+                logger.separator()
+                logger.info("Written {:d} users to {:s}".format(len(json_resp.get('followings')), following_txt))
+                logger.separator()
             if ptts.args.download:
                 logger.info("Starting download of all videos from profile.")
                 downloader.download_all(target_user_id)
