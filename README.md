@@ -1,7 +1,11 @@
 # PyTikTokScraper
-PyTikTokScraper
 
-Usage:
+### Requirements
+You need to install `mutagen` via pip.
+
+##
+
+### Usage
 `python3 -m pytiktokscraper --download whatthefish69`
 
 Use `--recent` to only download the first 10 videos in the user feed.
