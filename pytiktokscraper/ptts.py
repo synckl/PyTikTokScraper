@@ -20,6 +20,7 @@ def initialize():
     global cookies_path
     global args
     global epochtime
+    global signature_gen
     tt_username = None
     tt_password = None
     tt_target_user = None
@@ -29,3 +30,4 @@ def initialize():
     cookies_path = os.path.join(os.getcwd(), 'cookies')
     args = None
     epochtime = str(time.time())
+    signature_gen = helpers.CalcSig()

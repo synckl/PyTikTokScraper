@@ -3,6 +3,7 @@ from urllib import parse
 import requests
 import subprocess
 import os
+import hashlib
 
 try:
     import ptts
@@ -121,3 +122,71 @@ def make_request(url, posts=None, request_type=None):
             return requests.get(url, headers=headers)
     else:
         raise Exception("Missing request type. Must be GET or POST.")
+
+
+def get_timestamp():
+    return int(round(time.time() * 1000))
+
+
+class CalcSig(object):
+    key1 = '57218436'
+    key2 = '15387264'
+    rstr = 'efc84c17'
+
+    def shuffle(self, p1, p2):
+        p = ''
+        p += p1[int(p2[0], 10) - 1]
+        p += p1[int(p2[1], 10) - 1]
+        p += p1[int(p2[2], 10) - 1]
+        p += p1[int(p2[3], 10) - 1]
+        p += p1[int(p2[4], 10) - 1]
+        p += p1[int(p2[5], 10) - 1]
+        p += p1[int(p2[6], 10) - 1]
+        p += p1[int(p2[7], 10) - 1]
+        return p.lower()
+
+    def get_as_cp(self, u_md5, u_key1, u_key2):
+        ascp = list()
+        for i in range(36):
+            ascp.append(0)
+        ascp[0] = 'a'
+        ascp[1] = '1'
+        for i in range(0, 8):
+            ascp[2 * (i + 1)] = u_md5[i]
+            ascp[2 * i + 3] = u_key2[i]
+            ascp[2 * i + 18] = u_key1[i]
+            ascp[2 * i + 1 + 18] = u_md5[i + 24]
+        ascp[-2] = 'e'
+        ascp[-1] = '1'
+
+        return ''.join(ascp)
+
+    def parseURL(self, url):
+        param_index = url.find('?')
+        param = url[param_index + 1:]
+        param_list = param.split('&')
+        param_list.append('rstr='+self.rstr)
+        param_list = sorted(param_list)
+        result = ''
+        for a in param_list:
+            tmp = a.split('=')
+            tmp[1] = tmp[1].replace('+', 'a')
+            tmp[1] = tmp[1].replace(' ', 'a')
+            result += tmp[1]
+        return result
+
+    def calcMD5(self, str_encode):
+        m = hashlib.md5()
+        m.update(str_encode.encode('utf-8'))
+        return m.hexdigest()
+
+    def generate_as_cp(self, url, curtime):
+        url_param = self.parseURL(url)
+        p_md5 = self.calcMD5(url_param)
+        if curtime & 1:
+            p_md5 = self.calcMD5(p_md5)
+        hexTime = hex(curtime)[2:]
+        aa = self.shuffle(hexTime, self.key1)
+        bb = self.shuffle(hexTime, self.key2)
+        sig = self.get_as_cp(p_md5, aa, bb)
+        return sig[:18], sig[18:]

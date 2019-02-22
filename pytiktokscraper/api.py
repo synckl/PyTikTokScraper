@@ -65,23 +65,31 @@ def login(username, password):
 
 def search_user(username):
     request_url = Constants.BASE_URL + Constants.DISCOVER_ENDP.format(username) + helpers.query(Constants.DEVICE_VARS)
+    as_cp = ptts.signature_gen.generate_as_cp(request_url, helpers.get_timestamp())
+    request_url = request_url + "&as={:s}&cp={:s}".format(as_cp[0], as_cp[1])
     request_response = helpers.make_request(request_url, request_type="get")
     return request_response.json()
 
 
 def user_post_feed(user_id, max_cursor=0):
     request_url = Constants.BASE_URL + Constants.USER_POST_FEED_ENDP.format(user_id, max_cursor) + helpers.query(Constants.DEVICE_VARS)
+    as_cp = ptts.signature_gen.generate_as_cp(request_url, helpers.get_timestamp())
+    request_url = request_url + "&as={:s}&cp={:s}".format(as_cp[0], as_cp[1])
     request_response = helpers.make_request(request_url, request_type="get")
     return request_response.json()
 
 
 def get_live_feed(live_room_id):
     request_url = Constants.BASE_URL + Constants.LIVE_ROOM_ENDP.format(live_room_id) + helpers.query(Constants.DEVICE_VARS)
+    as_cp = ptts.signature_gen.generate_as_cp(request_url, helpers.get_timestamp())
+    request_url = request_url + "&as={:s}&cp={:s}".format(as_cp[0], as_cp[1])
     request_response = helpers.make_request(request_url, request_type="get")
     return request_response.json()
 
 
 def get_following(target_user_id):
     request_url = Constants.BASE_URL + Constants.USER_FOLLOWING_FNDP.format(target_user_id) + helpers.query(Constants.DEVICE_VARS)
+    as_cp = ptts.signature_gen.generate_as_cp(request_url, helpers.get_timestamp())
+    request_url = request_url + "&as={:s}&cp={:s}".format(as_cp[0], as_cp[1])
     request_response = helpers.make_request(request_url, request_type="get")
     return request_response.json()
