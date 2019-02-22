@@ -98,17 +98,23 @@ def run():
             if not args.isuid:
                 try:
                     target_user_json = api.search_user(ptts.tt_target_user)
-                    target_user_id = target_user_json.get('user_list')[0].get('user_info').get('uid')
-                except IndexError as e:
+                    for user in target_user_json.get('user_list'):
+                        if user.get('user_info').get('unique_id') == ptts.tt_target_user:
+                            ptts.tt_target_id = user.get('user_info').get('uid')
+                            logger.info("Found matching user profile with {:d} videos."
+                                        .format(user.get('user_info').get('aweme_count')))
+                    if not ptts.tt_target_id:
+                        raise IndexError
+                except IndexError:
                     logger.separator()
                     logger.error("No user found matching '{:s}', the script will now exit.".format(ptts.tt_target_user))
                     logger.separator()
                     sys.exit(1)
             else:
-                target_user_id = args.download
-            if target_user_id:
+                ptts.tt_target_id = args.download
+            if ptts.tt_target_id:
                 logger.separator()
-                logger.info("Retrieved user ID: {:s}".format(target_user_id))
+                logger.info("Retrieved user ID: {:s}".format(ptts.tt_target_id))
                 logger.separator()
             else:
                 logger.separator()
@@ -119,7 +125,7 @@ def run():
                 logger.info("Retrieving list of following users...")
                 logger.warn("Pagination does not work properly, use this at own risk!")
                 logger.separator()
-                json_resp = api.get_following(target_user_id)
+                json_resp = api.get_following(ptts.tt_target_id)
                 following_txt = os.path.join(os.getcwd(), "following_{:s}.txt".format(ptts.tt_target_user))
                 if os.path.isfile(following_txt):
                     os.remove(following_txt)
@@ -132,10 +138,10 @@ def run():
                 logger.separator()
             if ptts.args.download:
                 logger.info("Starting download of all videos from profile.")
-                downloader.download_all(target_user_id)
+                downloader.download_all(ptts.tt_target_id)
             elif ptts.args.single:
                 logger.info("Starting download of single video by id.")
                 downloader.download_single(ptts.tt_target_id)
             elif ptts.args.livestream:
                 logger.info("Starting download for livestream.")
-                downloader.download_live(target_user_id)
+                downloader.download_live(ptts.tt_target_id)
