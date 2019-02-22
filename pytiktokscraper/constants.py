@@ -18,7 +18,7 @@ class Constants:
     POST_INFO_ENDP = "aweme/v1/aweme/stats/?"
     USER_INFO_ENDP = "aweme/v1/user/?user_id={:d}&"
     USER_POST_FEED_ENDP = "aweme/v1/aweme/post/?user_id={:s}&type=0&count=20&pull_type=1&max_cursor={:d}&"
-    USER_FOLLOWING_FNDP = "aweme/v1/user/following/list/?user_id={:s}&offset=0&count=1000&max_time=" + str(int(time.time())) + "&source_type=2&"
+    USER_FOLLOWING_ENDP = "aweme/v1/user/following/list/?user_id={:s}&offset=0&count=1000&max_time=" + str(int(time.time())) + "&source_type=2&"
 
     LIVE_ROOM_ENDP = 'aweme/v1/room/enter/?room_id={:d}&'
     LIVE_FLV_ENDP = 'http://pull-flv-l1-mus.pstatp.com/hudong/stream-{}.flv'
@@ -33,17 +33,18 @@ class Constants:
     """
     Device variables.
     """
-    DEVICE_VARS = {'app_language': "en", 'language': "en", 'region': "au", 'app_type': "normal", 'sys_region': "AU",
-                   'carrier_region': "AU", 'carrier_region_v2': "286", 'build_number': "96104",
-                   'timezone_offset': "28800", 'timezone_name': "Australia/Sydney", 'mcc_mnc': "50502", 'is_my_cn': "1",
-                   'fp': "", 'account_region': "&", 'iid': "6620659482206930694", 'ac': "4G", 'channel': "App%20Store",
-                   'aid': "1233", 'app_name': "musical_ly", 'version_code': "9.6.1", 'version_name': "8.4.0",
-                   'device_id': "6623534804040304133", 'device_platform': "iphone", 'ssmix': "a",
-                   'device_type': "iPhone11,2", 'device_brand': "Apple", 'os_api': "18", 'os_version': "12.1",
-                   'openudid': "bdb28a05d14cf194ad2336d13d2409e2b8e2b43a", 'manifest_version_code': "2018090613",
+
+    DEVICE_VARS = {'app_language': "tr", 'language': "tr", 'region': "tr", 'app_type': "normal", 'sys_region': "TR",
+                   'carrier_region': "TR", 'carrier_region_v2': "286", 'build_number': "8.4.0",
+                   'timezone_offset': "10800", 'timezone_name': "Europe/Istanbul", 'mcc_mnc': "28601", 'is_my_cn': "0",
+                   'fp': "", 'account_region': "TR", 'iid': "6620659482206930694", 'ac': "wifi",
+                   'channel': "googleplay", 'aid': "1233", 'app_name': "musical_ly", 'version_code': "840",
+                   'version_name': "8.4.0", 'device_id': "6594726280552547846", 'device_platform': "android",
+                   'ssmix': "a", 'device_type': "TA-1020", 'device_brand': "Nokia", 'os_api': "26",
+                   'os_version': "8.0.0", 'openudid': "b307b864b574e818", 'manifest_version_code': "2018090613",
                    'resolution': "720*1280", 'dpi': "320", 'update_version_code': "2018090613",
-                   '_rticket': int(round(time.time() * 1000)), 'ts': int(round(time.time() * 1000)), 'as': "a1qwert123",
-                   'cp': "cbfhckdckkde1"}
+                   '_rticket': int(round(time.time() * 1000)), 'ts': int(round(time.time() * 1000)), 'as': "a1156b16e2936c738f",
+                   'cp': "bd36c85620f06f3ee1"}
 
     REQUESTS_UA = {'User-Agent': "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                                  "Chrome/60.0.3112.90 Safari/537.36"}
