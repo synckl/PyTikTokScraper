@@ -98,6 +98,7 @@ def run():
             if not args.isuid:
                 try:
                     target_user_json = api.search_user(ptts.tt_target_user)
+                    open('feed.json', 'w').write(json.dumps(target_user_json))
                     for user in target_user_json.get('user_list'):
                         if user.get('user_info').get('unique_id') == ptts.tt_target_user:
                             ptts.tt_target_id = user.get('user_info').get('uid')
@@ -105,7 +106,7 @@ def run():
                                         .format(user.get('user_info').get('aweme_count')))
                     if not ptts.tt_target_id:
                         raise IndexError
-                except IndexError:
+                except (IndexError, TypeError):
                     logger.separator()
                     logger.error("No user found matching '{:s}', the script will now exit.".format(ptts.tt_target_user))
                     logger.separator()
