@@ -1,4 +1,5 @@
 import requests
+import re
 import os
 from mutagen.mp4 import MP4
 
@@ -191,8 +192,18 @@ def download_live(target_user_id):
         if live_room_id:
             logger.info("Livestream available, getting information and beginning download.")
             logger.separator()
-            live_json = api.get_live_feed(live_room_id)
-            live_hls_url = Constants.LIVE_HLS_ENDP.format(live_json.get('room').get('stream_url').get('sid'))
+            s = requests.Session()
+            s.headers.update({
+                'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:60.0) Gecko/20100101 Firefox/60.0',
+            })
+            r = s.get(Constants.LIVE_WEB_URL.format(live_room_id))
+            r.raise_for_status()
+            live = r.text
+            live_info_obj = re.search(r'"hls_pull_url"\s*:\s*"(?P<hls_pull_url>[^"]+)"\s*,\s*"sid"\s*:\s*(?P<stream_id>\d+)',
+                             live)
+            live_hls_url = live_info_obj.group('hls_pull_url').replace('\\/', '/')
+            logger.info("HLS url: {:s}".format(live_hls_url))
+            logger.separator()
             logger.info("HLS url retrieved. Calling youtube-dl.")
             helpers.call_ytdl(live_hls_url, os.path.join(download_path, str(live_room_id) + "_" + ptts.epochtime))
         else:
@@ -201,3 +212,32 @@ def download_live(target_user_id):
     else:
         logger.info("There is no available livestream for this user.")
         logger.separator()
+
+
+
+
+    ### NEEDS LOGIN BUT IS BROKEN ###
+
+    # if not os.path.exists(os.path.join(ptts.dl_path, ptts.tt_target_user, 'broadcasts')):
+    #     os.makedirs(os.path.join(ptts.dl_path, ptts.tt_target_user, 'broadcasts'))
+    #
+    # download_path = os.path.join(ptts.dl_path, ptts.tt_target_user, 'broadcasts')
+    # logger.separator()
+    # logger.info("Checking for ongoing livestreams.")
+    # logger.separator()
+    # json_data = api.user_post_feed(user_id=target_user_id, max_cursor=0)
+    # if  json_data.get("aweme_list"):
+    #     live_room_id = json_data.get("aweme_list")[0].get('author', None).get('room_id', None)
+    #     if live_room_id:
+    #         logger.info("Livestream available, getting information and beginning download.")
+    #         logger.separator()
+    #         live_json = api.get_live_feed(live_room_id)
+    #         live_hls_url = Constants.LIVE_HLS_ENDP.format(live_json.get('room').get('stream_url').get('sid'))
+    #         logger.info("HLS url retrieved. Calling youtube-dl.")
+    #         helpers.call_ytdl(live_hls_url, os.path.join(download_path, str(live_room_id) + "_" + ptts.epochtime))
+    #     else:
+    #         logger.info("There is no available livestream for this user.")
+    #         logger.separator()
+    # else:
+    #     logger.info("There is no available livestream for this user.")
+    #     logger.separator()

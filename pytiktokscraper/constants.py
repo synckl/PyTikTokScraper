@@ -28,6 +28,7 @@ class Constants:
     LIVE_ROOM_ENDP = 'aweme/v1/room/enter/?room_id={:d}&'
     LIVE_FLV_ENDP = 'http://pull-flv-l1-mus.pstatp.com/hudong/stream-{}.flv'
     LIVE_HLS_ENDP = 'http://pull-hls-l1-mus.pstatp.com/hudong/stream-{}/playlist.m3u8'
+    LIVE_WEB_URL = 'https://m.tiktok.com/share/live/{}/?language=en'
 
     """
     We'll just keep these constants here for the sake of tidiness
