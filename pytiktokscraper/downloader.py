@@ -66,7 +66,7 @@ def download_all(target_user_id):
                     else:
                         video_uri = video.get("video").get("play_addr").get("uri")
                         video_desc = video.get("desc")
-                        filename = str(video.get("create_time")) + ".mp4"
+                        filename = '{:d}_{:s}.mp4'.format(video.get("create_time"), video.get("author").get("unique_id"))
                         if video_uri.isdigit():
                             actual_video_uri = video.get("video").get("play_addr").get("url_list")[0]
                             if not os.path.isfile(os.path.join(download_path, filename)):
