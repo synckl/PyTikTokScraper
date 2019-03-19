@@ -71,6 +71,12 @@ def search_user(username):
     return request_response.json()
 
 
+def search_user_tta(username):
+    request_url = Constants.DISCOVER_TTA_ENDP.format(username)
+    request_response = helpers.make_request(request_url, request_type="get")
+    return request_response.json()
+
+
 def user_post_feed(user_id, max_cursor=0):
     request_url = Constants.BASE_URL + Constants.USER_POST_FEED_ENDP.format(user_id, max_cursor) + helpers.query(Constants.DEVICE_VARS)
     as_cp = ptts.signature_gen.generate_as_cp(request_url, helpers.get_timestamp())
