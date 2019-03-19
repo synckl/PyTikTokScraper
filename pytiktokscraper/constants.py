@@ -40,7 +40,7 @@ class Constants:
     Device variables.
     """
 
-    DEVICE_VARS = {'app_language': "tr", 'language': "tr", 'region': "tr", 'app_type': "normal", 'sys_region': "TR",
+    DEVICE_VARS = {'app_language': "en", 'language': "en", 'region': "tr", 'app_type': "normal", 'sys_region': "TR",
                    'carrier_region': "TR", 'carrier_region_v2': "286", 'build_number': "8.4.0",
                    'timezone_offset': "10800", 'timezone_name': "Europe/Istanbul", 'mcc_mnc': "28601", 'is_my_cn': "0",
                    'fp': "", 'account_region': "TR", 'iid': random.randint(20000000000, 35000000000), 'ac': "wifi",
