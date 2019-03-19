@@ -112,8 +112,8 @@ def download_all(target_user_id):
                                                                                             video_uri))
                                     downloaded_total += 1
                                 else:
-                                    logger.warn("Response did not return status 200, was {:d} instead. Trying with lower "
-                                                "bitrate.".format(rr.status_code))
+                                    logger.warn("Response did not return status 200, was {:d} instead. Trying with "
+                                                "lower bitrate.".format(rr.status_code))
                                     rr = requests.get(Constants.VIDEO_BASE_URL.format(video_uri, 0), verify=True,
                                                       headers={"User-Agent": Constants.REQUESTS_UA["User-Agent"]})
                                     if rr.status_code == 200:
@@ -124,8 +124,8 @@ def download_all(target_user_id):
                                                                                                 video_uri))
                                         downloaded_total += 1
                                     else:
-                                        logger.warn("Response did not return status 200, was {:d} instead. Giving up and "
-                                                    "moving on.".format(rr.status_code))
+                                        logger.warn("Response did not return status 200, was {:d} instead. Giving up "
+                                                    "and moving on.".format(rr.status_code))
                                         logger.warn("The video Id was: {:s}".format(video_uri))
                             else:
                                 logger.info("({:d}/{:d}) - Already downloaded video with Id: {}".format(checked_total + 1,
