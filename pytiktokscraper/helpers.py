@@ -16,6 +16,7 @@ except ImportError:
     from . import logger
     from .constants import Constants
 
+
 def strdatetime():
     return time.strftime('%m-%d-%Y %I:%M:%S %p')
 
@@ -105,16 +106,21 @@ def make_request(url, posts=None, request_type=None):
         cookies = "null = 1;"
     url_parse = parse.urlsplit(url)
     headers = {
+        "X-SS-STUB": "65812F1862DA48711939361C1D7DDE2B",
+        "Accept-Encoding": "gzip",
+        "sdk-version": "1",
+        "Cookie": cookies,
+        "x-tt-token": "03804231875ca4f8e91cc80235d8d3d6b311d0b3873a40b558862491a9e504cff48d3604600865f84d6609acb43944031f9",
+        "X-Gorgon": "03006cc00000ca82ae964c86eee4216c66f887ee07f6f1cf7fb5",
+        "X-Khronos": str(int(time.time())),
+        "X-Pods": "",
         "Host": url_parse.netloc,
-        'X-SS-TC': "0",
-        'User-Agent': "com.zhiliaoapp.musically/2018090613 (Linux; U; Android 8.0.0; tr_TR; TA-1020; Build/O00623; "
-                      "Cronet/58.0.2991.0)",
-        'Accept-Encoding': "gzip",
-        'Connection': "keep-alive",
-        'X-Tt-Token': "",
-        'sdk-version': "1",
-        'Cookie': cookies
+        "Connection": "Keep-Alive",
+        "User-Agent": "com.zhiliaoapp.musically/2018111632 (Linux; U; Android 8.0.0; nl_NL; ONEPLUS A3003; Build/OPR1.170623.032; Cronet/58.0.2991.0)",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "X-Forwarded-For": requests.get("https://api.ipify.org/?format=text").text
     }
+
     if request_type:
         if request_type == "post":
             return requests.post(url, headers=headers, data=posts)
@@ -165,7 +171,7 @@ class CalcSig(object):
         param_index = url.find('?')
         param = url[param_index + 1:]
         param_list = param.split('&')
-        param_list.append('rstr='+self.rstr)
+        param_list.append('rstr=' + self.rstr)
         param_list = sorted(param_list)
         result = ''
         for a in param_list:

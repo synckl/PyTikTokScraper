@@ -67,7 +67,8 @@ def search_user(username):
     request_url = Constants.BASE_URL + Constants.DISCOVER_ENDP.format(username) + helpers.query(Constants.DEVICE_VARS)
     as_cp = ptts.signature_gen.generate_as_cp(request_url, helpers.get_timestamp())
     request_url = request_url + "&as={:s}&cp={:s}".format(as_cp[0], as_cp[1])
-    request_response = helpers.make_request(request_url, request_type="get")
+    #request_url = request_url + "&as=a1qwert123&cp=cbfhckdckkde1&mas=01937dea4a12a8c410eb526555c121d44decec4c0ccc0c8666c61c"
+    request_response = helpers.make_request(request_url, request_type="post")
     return request_response.json()
 
 

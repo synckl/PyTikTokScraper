@@ -71,8 +71,7 @@ def download_all(target_user_id):
                             actual_video_uri = video.get("video").get("play_addr").get("url_list")[0]
                             if not os.path.isfile(os.path.join(download_path, filename)):
 
-                                rr = requests.get(actual_video_uri, verify=True,
-                                                  headers={"User-Agent": Constants.REQUESTS_UA["User-Agent"]})
+                                rr = requests.get(actual_video_uri, verify=True)
                                 if rr.status_code == 200:
                                     open(os.path.join(download_path, filename), 'wb').write(rr.content)
                                     try:
@@ -96,8 +95,7 @@ def download_all(target_user_id):
                                                                                                         video_uri))
                         else:
                             if not os.path.isfile(os.path.join(download_path, filename)):
-                                rr = requests.get(Constants.VIDEO_BASE_URL.format(video_uri, 1), verify=True,
-                                                  headers={"User-Agent": Constants.REQUESTS_UA["User-Agent"]})
+                                rr = requests.get(Constants.VIDEO_BASE_URL.format(video_uri, 1), verify=True, headers=Constants.REQUESTS_VIDEO_UA)
                                 if rr.status_code == 200:
                                     open(os.path.join(download_path, filename), 'wb').write(rr.content)
                                     try:
@@ -114,8 +112,7 @@ def download_all(target_user_id):
                                 else:
                                     logger.warn("Response did not return status 200, was {:d} instead. Trying with "
                                                 "lower bitrate.".format(rr.status_code))
-                                    rr = requests.get(Constants.VIDEO_BASE_URL.format(video_uri, 0), verify=True,
-                                                      headers={"User-Agent": Constants.REQUESTS_UA["User-Agent"]})
+                                    rr = requests.get(Constants.VIDEO_BASE_URL.format(video_uri, 0), verify=True, headers=Constants.REQUESTS_VIDEO_UA)
                                     if rr.status_code == 200:
                                         open(os.path.join(download_path, filename), 'wb').write(rr.content)
                                         logger.info(
@@ -150,16 +147,14 @@ def download_single(video_id):
     try:
         download_path = os.path.join(ptts.dl_path, video_id + ".mp4")
         if not os.path.isfile(download_path):
-            rr = requests.get(Constants.VIDEO_BASE_URL.format(video_id, 1), verify=True,
-                              headers={"User-Agent": Constants.REQUESTS_UA["User-Agent"]})
+            rr = requests.get(Constants.VIDEO_BASE_URL.format(video_id, 1), verify=True, headers=Constants.REQUESTS_VIDEO_UA)
             if rr.status_code == 200:
                 open(download_path, 'wb').write(rr.content)
                 logger.info("Downloaded video with Id: {}".format(video_id))
             else:
                 logger.warn("Response did not return status 200, was {:d} instead. Trying with lower "
                             "bitrate.".format(rr.status_code))
-                rr = requests.get(Constants.VIDEO_BASE_URL.format(video_id, 0), verify=True,
-                                  headers={"User-Agent": Constants.REQUESTS_UA["User-Agent"]})
+                rr = requests.get(Constants.VIDEO_BASE_URL.format(video_id, 0), verify=True,  headers=Constants.REQUESTS_VIDEO_UA)
                 if rr.status_code == 200:
                     open(download_path, 'wb').write(rr.content)
                 else:
