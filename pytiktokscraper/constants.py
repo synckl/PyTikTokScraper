@@ -37,7 +37,7 @@ class Constants:
     We'll just keep these constants here for the sake of tidiness
     """
     PYTHON_VER = sys.version.split(' ')[0]
-    SCRIPT_VER = "1.4"
+    SCRIPT_VER = "1.5"
 
     """
     Device variables.
