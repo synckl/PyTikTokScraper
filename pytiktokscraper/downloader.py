@@ -1,6 +1,7 @@
 import requests
 import re
 import os
+import json
 from mutagen.mp4 import MP4
 
 try:
@@ -194,9 +195,10 @@ def download_live(target_user_id):
             r = s.get(Constants.LIVE_WEB_URL.format(live_room_id))
             r.raise_for_status()
             live = r.text
-            live_info_obj = re.search(r'"hls_pull_url"\s*:\s*"(?P<hls_pull_url>[^"]+)"\s*,\s*"sid"\s*:\s*(?P<stream_id>\d+)',
-                             live)
-            live_hls_url = live_info_obj.group('hls_pull_url').replace('\\/', '/')
+            live_info_obj = re.search(r'(?<=__INIT_PROPS__ = )(.*)(?=<\/)', live)[0]
+            live_info_obj = live_info_obj.replace('\\', '').replace("'", "\"").replace("false", "\"false\"")
+            live_info_obj_json = json.loads(live_info_obj)
+            live_hls_url = live_info_obj_json.get("/share/live/:id").get("liveData").get("LiveUrl")
             logger.info("HLS url: {:s}".format(live_hls_url))
             logger.separator()
             logger.info("HLS url retrieved. Calling youtube-dl.")
