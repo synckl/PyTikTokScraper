@@ -10,7 +10,7 @@ You need to install `mutagen` via pip.
 
 Use `--download` to specify an username whose TikToks to download. (If using uid as input you must also pass `-uid`)
 
-Use `--recent` to only download the first 10 videos in the user feed.
+Use `--recent` alongside `--download` to only download the most recent 10 videos in the user feed.
 
 Use `--single` to download a video with a given Id as argument (e.g. `--single 3e7da006d9234b198b554a0eb7a0b86f`)
 
