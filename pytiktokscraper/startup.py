@@ -102,8 +102,14 @@ def run():
                     for user in target_user_json.get('user_list'):
                         if user.get('user_info').get('unique_id') == ptts.tt_target_user:
                             ptts.tt_target_id = user.get('user_info').get('uid')
+                            video_count = user.get('user_info').get('aweme_count')
                             logger.info("Found matching user profile with {:d} videos."
-                                        .format(user.get('user_info').get('aweme_count')))
+                                        .format(video_count))
+                            if video_count < 1:
+                                logger.separator()
+                                logger.binfo("This user has no available videos to download.")
+                                logger.separator()
+                                sys.exit(0)
                     if not ptts.tt_target_id:
                         raise IndexError
                 except (IndexError, TypeError):
@@ -116,8 +122,14 @@ def run():
                         for user in target_user_json.get('user_list'):
                             if user.get('user_info').get('unique_id') == ptts.tt_target_user:
                                 ptts.tt_target_id = user.get('user_info').get('uid')
+                                video_count = user.get('user_info').get('aweme_count')
                                 logger.info("Found matching user profile with {:d} videos."
-                                            .format(user.get('user_info').get('aweme_count')))
+                                            .format(video_count))
+                                if video_count < 1:
+                                    logger.separator()
+                                    logger.binfo("This user has no available videos to download.")
+                                    logger.separator()
+                                    sys.exit(0)
                         if not ptts.tt_target_id:
                             raise IndexError
                     except (IndexError, TypeError):
