@@ -94,8 +94,8 @@ def run():
         if ptts.tt_active_user:
             logger.info("Login successful.")
             logger.separator()
-            logger.info("Getting user information for '{:s}'.".format(ptts.tt_target_user))
-            if not args.isuid:
+            if not args.isuid and args.download:
+                logger.info("Getting user information for '{:s}'.".format(ptts.tt_target_user))
                 try:
                     target_user_json = api.search_user(ptts.tt_target_user)
                     open('feed.json', 'w').write(json.dumps(target_user_json))
@@ -118,19 +118,21 @@ def run():
                     logger.separator()
                     try:
                         target_user_json = api.search_user_tta(ptts.tt_target_user)
-                        open('feed.json', 'w').write(json.dumps(target_user_json))
-                        for user in target_user_json.get('user_list'):
-                            if user.get('user_info').get('unique_id') == ptts.tt_target_user:
-                                ptts.tt_target_id = user.get('user_info').get('uid')
-                                video_count = user.get('user_info').get('aweme_count')
-                                logger.info("Found matching user profile with {:d} videos."
-                                            .format(video_count))
-                                if video_count < 1:
-                                    logger.separator()
-                                    logger.binfo("This user has no available videos to download.")
-                                    logger.separator()
-                                    sys.exit(0)
-                        if not ptts.tt_target_id:
+                        if target_user_json:
+                            for user in target_user_json.get('user_list'):
+                                if user.get('user_info').get('unique_id') == ptts.tt_target_user:
+                                    ptts.tt_target_id = user.get('user_info').get('uid')
+                                    video_count = user.get('user_info').get('aweme_count')
+                                    logger.info("Found matching user profile with {:d} videos."
+                                                .format(video_count))
+                                    if video_count < 1:
+                                        logger.separator()
+                                        logger.binfo("This user has no available videos to download.")
+                                        logger.separator()
+                                        sys.exit(0)
+                            if not ptts.tt_target_id:
+                                raise IndexError
+                        else:
                             raise IndexError
                     except (IndexError, TypeError):
                         logger.error(
@@ -138,9 +140,14 @@ def run():
                         logger.separator()
                         sys.exit(0)
             else:
-                ptts.tt_target_id = args.download
+                ptts.tt_target_id = args.livestream or args.download
+                try:
+                    int(ptts.tt_target_id)
+                except ValueError:
+                    logger.error("The user ID '{}' is not a valid value. Exiting.".format(ptts.tt_target_id))
+                    logger.separator()
+                    sys.exit(1)
             if ptts.tt_target_id:
-                logger.separator()
                 logger.info("Retrieved user ID: {:s}".format(ptts.tt_target_id))
                 logger.separator()
             else:

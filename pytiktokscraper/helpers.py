@@ -98,36 +98,40 @@ def user_data_export(data):
 
 
 def make_request(url, posts=None, request_type=None):
-    cookies = ""
-    if ptts.tt_active_user:
-        for key, value in ptts.tt_active_user.get('cookies').items():
-            cookies += key + "=" + value + "; "
-    else:
-        cookies = "null = 1;"
-    url_parse = parse.urlsplit(url)
-    headers = {
-        "X-SS-STUB": "65812F1862DA48711939361C1D7DDE2B",
-        "Accept-Encoding": "gzip",
-        "sdk-version": "1",
-        "Cookie": cookies,
-        "x-tt-token": "03804231875ca4f8e91cc80235d8d3d6b311d0b3873a40b558862491a9e504cff48d3604600865f84d6609acb43944031f9",
-        "X-Gorgon": "03006cc00000ca82ae964c86eee4216c66f887ee07f6f1cf7fb5",
-        "X-Khronos": str(int(time.time())),
-        "X-Pods": "",
-        "Host": url_parse.netloc,
-        "Connection": "Keep-Alive",
-        "User-Agent": "com.zhiliaoapp.musically/2018111632 (Linux; U; Android 8.0.0; nl_NL; ONEPLUS A3003; Build/OPR1.170623.032; Cronet/58.0.2991.0)",
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "X-Forwarded-For": requests.get("https://api.ipify.org/?format=text").text
-    }
+    try:
+        cookies = ""
+        if ptts.tt_active_user:
+            for key, value in ptts.tt_active_user.get('cookies').items():
+                cookies += key + "=" + value + "; "
+        else:
+            cookies = "null = 1;"
+        url_parse = parse.urlsplit(url)
+        headers = {
+            "X-SS-STUB": "65812F1862DA48711939361C1D7DDE2B",
+            "Accept-Encoding": "gzip",
+            "sdk-version": "1",
+            "Cookie": cookies,
+            "x-tt-token": "03804231875ca4f8e91cc80235d8d3d6b311d0b3873a40b558862491a9e504cff48d3604600865f84d6609acb43944031f9",
+            "X-Gorgon": "03006cc00000ca82ae964c86eee4216c66f887ee07f6f1cf7fb5",
+            "X-Khronos": str(int(time.time())),
+            "X-Pods": "",
+            "Host": url_parse.netloc,
+            "Connection": "Keep-Alive",
+            "User-Agent": "com.zhiliaoapp.musically/2018111632 (Linux; U; Android 8.0.0; nl_NL; ONEPLUS A3003; Build/OPR1.170623.032; Cronet/58.0.2991.0)",
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "X-Forwarded-For": requests.get("https://api.ipify.org/?format=text", timeout=5).text
+        }
 
-    if request_type:
-        if request_type == "post":
-            return requests.post(url, headers=headers, data=posts)
-        elif request_type == "get":
-            return requests.get(url, headers=headers)
-    else:
-        raise Exception("Missing request type. Must be GET or POST.")
+        if request_type:
+            if request_type == "post":
+                return requests.post(url, headers=headers, data=posts, timeout=5)
+            elif request_type == "get":
+                return requests.get(url, headers=headers, timeout=5)
+        else:
+            raise Exception("Missing request type. Must be GET or POST.")
+    except Exception as e:
+        logger.error("An error occurred: {}".format(str(e)))
+        return None
 
 
 def get_timestamp():

@@ -182,30 +182,20 @@ def download_live(target_user_id):
     logger.separator()
     logger.info("Checking for ongoing livestreams.")
     logger.separator()
-    json_data = api.user_post_feed(user_id=target_user_id, max_cursor=0)
-    if  json_data.get("aweme_list"):
-        live_room_id = json_data.get("aweme_list")[0].get('author', None).get('room_id', None)
-        if live_room_id:
-            logger.info("Livestream available, getting information and beginning download.")
-            logger.separator()
-            s = requests.Session()
-            s.headers.update({
-                'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:60.0) Gecko/20100101 Firefox/60.0',
-            })
-            r = s.get(Constants.LIVE_WEB_URL.format(live_room_id))
-            r.raise_for_status()
-            live = r.text
-            live_info_obj = re.search(r'(?<=__INIT_PROPS__ = )(.*)(?=<\/)', live)[0]
-            live_info_obj = live_info_obj.replace('\\', '').replace("'", "\"").replace("false", "\"false\"")
-            live_info_obj_json = json.loads(live_info_obj)
-            live_hls_url = live_info_obj_json.get("/share/live/:id").get("liveData").get("LiveUrl")
-            logger.info("HLS url: {:s}".format(live_hls_url))
-            logger.separator()
-            logger.info("HLS url retrieved. Calling youtube-dl.")
-            helpers.call_ytdl(live_hls_url, os.path.join(download_path, str(live_room_id) + "_" + ptts.epochtime))
-        else:
-            logger.info("There is no available livestream for this user.")
-            logger.separator()
+    s = requests.Session()
+    s.headers.update({
+        'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:60.0) Gecko/20100101 Firefox/60.0',
+    })
+    r = s.get(Constants.LIVE_WEB_URL.format(target_user_id))
+    r.raise_for_status()
+    live = r.text
+    live_room_id = re.search(r'(stream-)(.*)(?=\/playlist)', live)[2]
+    live_hls_url = Constants.LIVE_HLS_ENDP.format(live_room_id) if live_room_id else None
+    if live_hls_url:
+        logger.info("HLS url: {:s}".format(live_hls_url))
+        logger.separator()
+        logger.info("HLS url retrieved. Calling youtube-dl.")
+        helpers.call_ytdl(live_hls_url, os.path.join(download_path, str(live_room_id) + "_" + ptts.epochtime))
     else:
         logger.info("There is no available livestream for this user.")
         logger.separator()

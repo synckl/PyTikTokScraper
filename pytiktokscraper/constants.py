@@ -18,7 +18,7 @@ class Constants:
                      ":s}&line=1&ratio=540p&media_type=4&vr_type=0&test_cdn=None&improve_bitrate={:d}"
     LOGIN_ENDP = "passport/user/login/?"
     FEED_ENDP = "aweme/v1/feed/?count=20&offset=0&max_cursor=0&type=0&is_cold_start=1&pull_type=1&"
-    DISCOVER_ENDP = "aweme/v1/discover/search/?cursor=0&keyword={:s}&count=10&type=1&is_pull_refresh=0&hot_search=0&search_source=&"
+    DISCOVER_ENDP = "aweme/v1/discover/search/?cursor=0&keyword={:s}&count=10&type=1&is_pull_refresh=0&hot_search=0&search_source&"
     DISCOVER_TTA_ENDP = "https://tiktokapi.ga/php/jsonusr.php?q={:s}&cursor=0"
     LIKE_STATUS_ENDP = "aweme/v1/commit/item/digg/?aweme_id={:d}&type={:d}&retry_type=no_retry&from=3&"
     FOLLOW_STATUS_ENDP = "aweme/v1/commit/follow/user/?user_id={:s}&type={:d}&retry_type=no_retry&from=3&"
@@ -30,7 +30,7 @@ class Constants:
 
     LIVE_ROOM_ENDP = 'aweme/v1/room/enter/?room_id={:d}&'
     LIVE_FLV_ENDP = 'http://pull-flv-l1-mus.pstatp.com/hudong/stream-{}.flv'
-    LIVE_HLS_ENDP = 'http://pull-hls-l1-mus.pstatp.com/hudong/stream-{}/playlist.m3u8'
+    LIVE_HLS_ENDP = 'http://pull-hls-l1-mus.pstatp.com/stage/stream-{}/playlist.m3u8'
     LIVE_WEB_URL = 'https://m.tiktok.com/share/live/{}/?language=en'
 
     """
@@ -44,42 +44,48 @@ class Constants:
     """
 
     DEVICE_VARS = {
-        "ab_version": "9.1.0",
-        "ac": "wifi",
-        "aid": "1233",
-        "app_language": "nl",
-        "app_name": "musical_ly",
+        "js_sdk_version": "",
         "app_type": "normal",
-        "build_number": "9.1.0",
-        "carrier_region": "NL",
-        "carrier_region_v2": "204",
-        "channel": "googleplay",
-        "device_brand": "OnePlus",
-        "device_id": "6517297815805396485",
-        "device_platform": "android",
-        "device_type": "ONEPLUS A3003",
-        "dpi": "345",
-        "fp": "",
-        "iid": "6668385510333073157",
-        "is_my_cn": "0",
-        "language": "nl",
-        "manifest_version_code": "2018111632",
-        "mcc_mnc": "20416",
-        "openudid": "715b23f90e7d1967",
-        "os_api": "26",
-        "os_version": "8.0.0",
-        "region": "NL",
-        "resolution": "1080*1920",
+        "os_api": "22",
+        "device_type": "SM-G920F",
         "ssmix": "a",
-        "sys_region": "NL",
-        "timezone_name": "Europe/Amsterdam",
+        "manifest_version_code": "2019011531",
+        "dpi": "420",
+        "carrier_region": "NL",
+        "region": "US",
+        "carrier_region_v2": "",
+        "app_name": "musical_ly",
+        "version_name": "9.9.0",
+        "ab_version": "9.9.0",
         "timezone_offset": "28800",
-        "update_version_code": "2018111632",
-        "version_code": 910,
-        "version_name": "9.1.0",
+        "pass-route": "1",
+        "pass-region": "1",
+        "is_my_cn": "0",
+        "fp": "TlTrLSLMLzwSFl5rF2U1LSFIcrGe",
+        "ac": "wifi",
+        "update_version_code": "2019011531",
+        "channel": "googleplay",
+        "device_platform": "android",
+        "iid": "6661938120256931589",
+        "build_number": "9.9.0",
+        "version_code": "990",
+        "timezone_name": "Asia/Shanghai",
+        "openudid": "9479023183233382",
+        "device_id": "6661937182847157766",
+        "sys_region": "US",
+        "app_language": "en",
+        "resolution": "1080*1920",
+        "os_version": "5.1.1",
+        "device_brand": "samsung",
+        "language": "en",
+        "aid": "1233",
+        "mcc_mnc": "20404",
+        "as": "a165194f0f0d7ccca26455",
+        "cp": "99d2c15ff120f5cee1[cIg",
+        "mas": "01ced3034f4e7feb1f2b774417ce9d3fdcacac2c6c4c86c6c6c6e",
         "_rticket": str(int(time.time())),
         "ts": str(int(time.time())),
     }
 
     REQUESTS_VIDEO_UA = {'User-Agent': "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                                 "Chrome/60.0.3112.90 Safari/537.36"}
+                         "Chrome/60.0.3112.90 Safari/537.36"}
