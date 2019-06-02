@@ -168,8 +168,11 @@ def run():
             downloader.download_all(ptts.tt_target_id)
         elif ptts.args.livestream:
             logger.info("Starting download for livestream.")
-            print(ptts.tt_target_user_liveroomid)
-            downloader.download_live(ptts.tt_target_user_liveroomid)
+            if ptts.tt_target_user_liveroomid:
+                downloader.download_live(ptts.tt_target_user_liveroomid)
+            else:
+                logger.warn("SHIIIEEEET NIGGA THERE BE NO LIVE STREAM RIGHT NOW")
+                logger.separator()
 
 
 
