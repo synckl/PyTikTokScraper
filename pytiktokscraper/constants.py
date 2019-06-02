@@ -13,7 +13,7 @@ class Constants:
     Some of the endpoints used by TikTok.
     We'll probably only use the Login endpoint and the User Post Feed endpoint.
     """""
-    BASE_URL = "https://api2.musical.ly/"
+    BASE_URL = "https://api2-19-h2.musical.ly/"
     VIDEO_BASE_URL = "https://api2.musical.ly/aweme/v1/play/?video_id={" \
                      ":s}&line=1&ratio=540p&media_type=4&vr_type=0&test_cdn=None&improve_bitrate={:d}"
     LOGIN_ENDP = "passport/user/login/?"

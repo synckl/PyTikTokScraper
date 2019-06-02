@@ -98,8 +98,8 @@ def user_data_export(data):
 
 
 def make_request(url, posts=None, request_type=None):
+    cookies = ""
     try:
-        cookies = ""
         if ptts.tt_active_user:
             for key, value in ptts.tt_active_user.get('cookies').items():
                 cookies += key + "=" + value + "; "
@@ -107,19 +107,13 @@ def make_request(url, posts=None, request_type=None):
             cookies = "null = 1;"
         url_parse = parse.urlsplit(url)
         headers = {
-            "X-SS-STUB": "65812F1862DA48711939361C1D7DDE2B",
             "Accept-Encoding": "gzip",
             "sdk-version": "1",
-            "Cookie": cookies,
-            "x-tt-token": "03804231875ca4f8e91cc80235d8d3d6b311d0b3873a40b558862491a9e504cff48d3604600865f84d6609acb43944031f9",
-            "X-Gorgon": "03006cc00000ca82ae964c86eee4216c66f887ee07f6f1cf7fb5",
-            "X-Khronos": str(int(time.time())),
-            "X-Pods": "",
+            "Cookie": "cookies",
+            "x-tt-token": "03aa7fe52bf9eae34e66d2ae1aae56a9d198947aaffbdfe62122332ef637fea45596abd9673d432a9876e4eeb55248c1e40",
             "Host": url_parse.netloc,
             "Connection": "Keep-Alive",
-            "User-Agent": "com.zhiliaoapp.musically/2018111632 (Linux; U; Android 8.0.0; nl_NL; ONEPLUS A3003; Build/OPR1.170623.032; Cronet/58.0.2991.0)",
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "X-Forwarded-For": requests.get("https://api.ipify.org/?format=text", timeout=5).text
+            "User-Agent": "okhttp/3.10.0.1",
         }
 
         if request_type:

@@ -174,7 +174,7 @@ def download_single(video_id):
         logger.separator()
 
 
-def download_live(target_user_id):
+def download_live(target_room_id):
     if not os.path.exists(os.path.join(ptts.dl_path, ptts.tt_target_user, 'broadcasts')):
         os.makedirs(os.path.join(ptts.dl_path, ptts.tt_target_user, 'broadcasts'))
 
@@ -186,16 +186,16 @@ def download_live(target_user_id):
     s.headers.update({
         'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:60.0) Gecko/20100101 Firefox/60.0',
     })
-    r = s.get(Constants.LIVE_WEB_URL.format(target_user_id))
+    r = s.get(Constants.LIVE_WEB_URL.format(target_room_id))
     r.raise_for_status()
     live = r.text
-    live_room_id = re.search(r'(stream-)(.*)(?=\/playlist)', live)[2]
-    live_hls_url = Constants.LIVE_HLS_ENDP.format(live_room_id) if live_room_id else None
-    if live_hls_url:
+    live_room_id = re.search(r'(stream-)(.*)(?=\/playlist)', live)
+    if live_room_id:
+        live_hls_url = Constants.LIVE_HLS_ENDP.format(live_room_id[2])
         logger.info("HLS url: {:s}".format(live_hls_url))
         logger.separator()
         logger.info("HLS url retrieved. Calling youtube-dl.")
-        helpers.call_ytdl(live_hls_url, os.path.join(download_path, str(live_room_id) + "_" + ptts.epochtime))
+        helpers.call_ytdl(live_hls_url, os.path.join(download_path, str(live_room_id[2]) + "_" + ptts.epochtime))
     else:
         logger.info("There is no available livestream for this user.")
         logger.separator()

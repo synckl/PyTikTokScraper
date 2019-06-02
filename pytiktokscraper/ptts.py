@@ -21,6 +21,7 @@ def initialize():
     global args
     global epochtime
     global signature_gen
+    global tt_target_user_liveroomid
     tt_username = None
     tt_password = None
     tt_target_user = None
@@ -31,3 +32,4 @@ def initialize():
     args = None
     epochtime = str(time.time())
     signature_gen = helpers.CalcSig()
+    tt_target_user_liveroomid = None

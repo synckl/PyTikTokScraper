@@ -90,92 +90,188 @@ def run():
     args = parser.parse_args()
 
     if validate_inputs(config, args):
-        api.login(username=ptts.tt_username, password=ptts.tt_password)
-        if ptts.tt_active_user:
-            logger.info("Login successful.")
-            logger.separator()
-            if not args.isuid and args.download:
-                logger.info("Getting user information for '{:s}'.".format(ptts.tt_target_user))
+        api.login()
+        if args.download or args.livestream and not args.isuid:
+            try:
+                target_user_json = api.search_user(ptts.tt_target_user)
+                open('feed.json', 'w').write(json.dumps(target_user_json))
+                for user in target_user_json.get('user_list'):
+                    if user.get('user_info').get('unique_id') == ptts.tt_target_user:
+                        ptts.tt_target_id = user.get('user_info').get('uid')
+                        ptts.tt_target_user_liveroomid = user.get('user_info').get('room_id') if user.get('user_info').get('room_id') > 0 else None
+                        video_count = user.get('user_info').get('aweme_count')
+                        logger.info("Found matching user profile with {:d} videos."
+                                    .format(video_count))
+                        if args.download and video_count < 1:
+                            logger.separator()
+                            logger.binfo("This user has no available videos to download.")
+                            logger.separator()
+                            sys.exit(0)
+                if not ptts.tt_target_id:
+                    raise IndexError
+            except (IndexError, TypeError):
+                logger.separator()
+                logger.error("No user found matching '{:s}', trying tiktokapi.ga search.".format(ptts.tt_target_user))
+                logger.separator()
                 try:
-                    target_user_json = api.search_user(ptts.tt_target_user)
-                    open('feed.json', 'w').write(json.dumps(target_user_json))
-                    for user in target_user_json.get('user_list'):
-                        if user.get('user_info').get('unique_id') == ptts.tt_target_user:
-                            ptts.tt_target_id = user.get('user_info').get('uid')
-                            video_count = user.get('user_info').get('aweme_count')
-                            logger.info("Found matching user profile with {:d} videos."
-                                        .format(video_count))
-                            if video_count < 1:
-                                logger.separator()
-                                logger.binfo("This user has no available videos to download.")
-                                logger.separator()
-                                sys.exit(0)
-                    if not ptts.tt_target_id:
+                    target_user_json = api.search_user_tta(ptts.tt_target_user)
+                    if target_user_json:
+                        for user in target_user_json.get('user_list'):
+                            if user.get('user_info').get('unique_id') == ptts.tt_target_user:
+                                ptts.tt_target_id = user.get('user_info').get('uid')
+                                ptts.tt_target_user_liveroomid = user.get('user_info').get('room_id') if user.get('user_info').get('room_id') > 0 else None
+                                video_count = user.get('user_info').get('aweme_count')
+                                logger.info("Found matching user profile with {:d} videos."
+                                            .format(video_count))
+                                if args.download and video_count < 1:
+                                    logger.separator()
+                                    logger.binfo("This user has no available videos to download.")
+                                    logger.separator()
+                                    sys.exit(0)
+                        if not ptts.tt_target_id:
+                            raise IndexError
+                    else:
                         raise IndexError
                 except (IndexError, TypeError):
+                    logger.error(
+                        "No results on tiktokapi.ga either, the script will now exit.".format(ptts.tt_target_user))
                     logger.separator()
-                    logger.error("No user found matching '{:s}', trying tiktokapi.ga search.".format(ptts.tt_target_user))
-                    logger.separator()
-                    try:
-                        target_user_json = api.search_user_tta(ptts.tt_target_user)
-                        if target_user_json:
-                            for user in target_user_json.get('user_list'):
-                                if user.get('user_info').get('unique_id') == ptts.tt_target_user:
-                                    ptts.tt_target_id = user.get('user_info').get('uid')
-                                    video_count = user.get('user_info').get('aweme_count')
-                                    logger.info("Found matching user profile with {:d} videos."
-                                                .format(video_count))
-                                    if video_count < 1:
-                                        logger.separator()
-                                        logger.binfo("This user has no available videos to download.")
-                                        logger.separator()
-                                        sys.exit(0)
-                            if not ptts.tt_target_id:
-                                raise IndexError
-                        else:
-                            raise IndexError
-                    except (IndexError, TypeError):
-                        logger.error(
-                            "No results on tiktokapi.ga either, the script will now exit.".format(ptts.tt_target_user))
-                        logger.separator()
-                        sys.exit(0)
-            else:
-                ptts.tt_target_id = args.livestream or args.download
-                try:
-                    int(ptts.tt_target_id)
-                except ValueError:
-                    logger.error("The user ID '{}' is not a valid value. Exiting.".format(ptts.tt_target_id))
-                    logger.separator()
-                    sys.exit(1)
-            if ptts.tt_target_id:
-                logger.info("Retrieved user ID: {:s}".format(ptts.tt_target_id))
-                logger.separator()
-            else:
-                logger.separator()
-                logger.warn("No user ID found. Exiting.")
+                    sys.exit(0)
+        elif args.download and args.isuid:
+            ptts.tt_target_id = args.livestream or args.download
+            try:
+                int(ptts.tt_target_id)
+            except ValueError:
+                logger.error("The user ID '{}' is not a valid value. Exiting.".format(ptts.tt_target_id))
                 logger.separator()
                 sys.exit(1)
-            if args.getfollowing:
-                logger.info("Retrieving list of following users...")
-                logger.warn("Pagination does not work properly, use this at own risk!")
-                logger.separator()
-                json_resp = api.get_following(ptts.tt_target_id)
-                following_txt = os.path.join(os.getcwd(), "following_{:s}.txt".format(ptts.tt_target_user))
-                if os.path.isfile(following_txt):
-                    os.remove(following_txt)
-                for user in json_resp.get('followings'):
-                    user_text = user.get('unique_id') + " - " + user.get('uid')
-                    logger.plain(user_text)
-                    open(following_txt, 'a').write(user_text + '\n')
-                logger.separator()
-                logger.info("Written {:d} users to {:s}".format(len(json_resp.get('followings')), following_txt))
-                logger.separator()
-            if ptts.args.download:
-                logger.info("Starting download of all videos from profile.")
-                downloader.download_all(ptts.tt_target_id)
-            elif ptts.args.single:
-                logger.info("Starting download of single video by id.")
-                downloader.download_single(ptts.tt_target_id)
-            elif ptts.args.livestream:
-                logger.info("Starting download for livestream.")
-                downloader.download_live(ptts.tt_target_id)
+        if ptts.tt_target_id:
+            logger.info("Retrieved user ID: {:s}".format(ptts.tt_target_id))
+            logger.separator()  
+        if args.getfollowing:
+            logger.info("Retrieving list of following users...")
+            logger.warn("Pagination does not work properly, use this at own risk!")
+            logger.separator()
+            json_resp = api.get_following(ptts.tt_target_id)
+            following_txt = os.path.join(os.getcwd(), "following_{:s}.txt".format(ptts.tt_target_user))
+            if os.path.isfile(following_txt):
+                os.remove(following_txt)
+            for user in json_resp.get('followings'):
+                user_text = user.get('unique_id') + " - " + user.get('uid')
+                logger.plain(user_text)
+                open(following_txt, 'a').write(user_text + '\n')
+            logger.separator()
+            logger.info("Written {:d} users to {:s}".format(len(json_resp.get('followings')), following_txt))
+            logger.separator()
+        if ptts.args.download:
+            logger.info("Starting download of all videos from profile.")
+            downloader.download_all(ptts.tt_target_id)
+        elif ptts.args.livestream:
+            logger.info("Starting download for livestream.")
+            print(ptts.tt_target_user_liveroomid)
+            downloader.download_live(ptts.tt_target_user_liveroomid)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # api.login(username=ptts.tt_username, password=ptts.tt_password)
+        # if ptts.tt_active_user:
+        #     logger.info("Login successful.")
+        #     logger.separator()
+        #     if not args.isuid and args.download:
+        #         logger.info("Getting user information for '{:s}'.".format(ptts.tt_target_user))
+        #         try:
+        #             target_user_json = api.search_user(ptts.tt_target_user)
+        #             open('feed.json', 'w').write(json.dumps(target_user_json))
+        #             for user in target_user_json.get('user_list'):
+        #                 if user.get('user_info').get('unique_id') == ptts.tt_target_user:
+        #                     ptts.tt_target_id = user.get('user_info').get('uid')
+        #                     video_count = user.get('user_info').get('aweme_count')
+        #                     logger.info("Found matching user profile with {:d} videos."
+        #                                 .format(video_count))
+        #                     if video_count < 1:
+        #                         logger.separator()
+        #                         logger.binfo("This user has no available videos to download.")
+        #                         logger.separator()
+        #                         sys.exit(0)
+        #             if not ptts.tt_target_id:
+        #                 raise IndexError
+        #         except (IndexError, TypeError):
+        #             logger.separator()
+        #             logger.error("No user found matching '{:s}', trying tiktokapi.ga search.".format(ptts.tt_target_user))
+        #             logger.separator()
+        #             try:
+        #                 target_user_json = api.search_user_tta(ptts.tt_target_user)
+        #                 if target_user_json:
+        #                     for user in target_user_json.get('user_list'):
+        #                         if user.get('user_info').get('unique_id') == ptts.tt_target_user:
+        #                             ptts.tt_target_id = user.get('user_info').get('uid')
+        #                             video_count = user.get('user_info').get('aweme_count')
+        #                             logger.info("Found matching user profile with {:d} videos."
+        #                                         .format(video_count))
+        #                             if video_count < 1:
+        #                                 logger.separator()
+        #                                 logger.binfo("This user has no available videos to download.")
+        #                                 logger.separator()
+        #                                 sys.exit(0)
+        #                     if not ptts.tt_target_id:
+        #                         raise IndexError
+        #                 else:
+        #                     raise IndexError
+        #             except (IndexError, TypeError):
+        #                 logger.error(
+        #                     "No results on tiktokapi.ga either, the script will now exit.".format(ptts.tt_target_user))
+        #                 logger.separator()
+        #                 sys.exit(0)
+        #     else:
+        #         ptts.tt_target_id = args.livestream or args.download
+        #         try:
+        #             int(ptts.tt_target_id)
+        #         except ValueError:
+        #             logger.error("The user ID '{}' is not a valid value. Exiting.".format(ptts.tt_target_id))
+        #             logger.separator()
+        #             sys.exit(1)
+        #     if ptts.tt_target_id:
+        #         logger.info("Retrieved user ID: {:s}".format(ptts.tt_target_id))
+        #         logger.separator()
+        #     else:
+        #         logger.separator()
+        #         logger.warn("No user ID found. Exiting.")
+        #         logger.separator()
+        #         sys.exit(1)
+        #     if args.getfollowing:
+        #         logger.info("Retrieving list of following users...")
+        #         logger.warn("Pagination does not work properly, use this at own risk!")
+        #         logger.separator()
+        #         json_resp = api.get_following(ptts.tt_target_id)
+        #         following_txt = os.path.join(os.getcwd(), "following_{:s}.txt".format(ptts.tt_target_user))
+        #         if os.path.isfile(following_txt):
+        #             os.remove(following_txt)
+        #         for user in json_resp.get('followings'):
+        #             user_text = user.get('unique_id') + " - " + user.get('uid')
+        #             logger.plain(user_text)
+        #             open(following_txt, 'a').write(user_text + '\n')
+        #         logger.separator()
+        #         logger.info("Written {:d} users to {:s}".format(len(json_resp.get('followings')), following_txt))
+        #         logger.separator()
+        #     if ptts.args.download:
+        #         logger.info("Starting download of all videos from profile.")
+        #         downloader.download_all(ptts.tt_target_id)
+        #     elif ptts.args.single:
+        #         logger.info("Starting download of single video by id.")
+        #         downloader.download_single(ptts.tt_target_id)
+        #     elif ptts.args.livestream:
+        #         logger.info("Starting download for livestream.")
+        #         downloader.download_live(ptts.tt_target_id)
