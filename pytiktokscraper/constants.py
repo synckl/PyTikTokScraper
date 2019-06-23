@@ -17,7 +17,9 @@ class Constants:
     VIDEO_BASE_URL = "https://api2.musical.ly/aweme/v1/play/?video_id={" \
                      ":s}&line=1&ratio=540p&media_type=4&vr_type=0&test_cdn=None&improve_bitrate={:d}"
     LOGIN_ENDP = "passport/user/login/?"
-    FEED_ENDP = "aweme/v1/feed/?count=20&offset=0&max_cursor=0&type=0&is_cold_start=1&pull_type=1&"
+    FEED_ENDP = "aweme/v1/feed/?count=20&offset=0&max_cursor=0&type=0&is_cold_start=1&pull_type=1&max_cursor={:d}&"
+    HASHTAG_SEARCH_ENDP = "aweme/v1/challenge/search/?cursor=0&keyword=%23{:s}&count=1&hot_search=0&is_pull_refresh=0&search_source=challenge&"
+    HASHTAG_FEED_ENDP = "aweme/v1/challenge/aweme/?ch_id={:s}&query_type=0&cursor={:d}&type=5&retry_type=no_retry&"
     DISCOVER_ENDP = "aweme/v1/discover/search/?cursor=0&keyword={:s}&count=10&type=1&is_pull_refresh=0&hot_search=0&search_source&"
     DISCOVER_TTA_ENDP = "https://tiktokapi.ga/php/jsonusr.php?q={:s}&cursor=0"
     LIKE_STATUS_ENDP = "aweme/v1/commit/item/digg/?aweme_id={:d}&type={:d}&retry_type=no_retry&from=3&"

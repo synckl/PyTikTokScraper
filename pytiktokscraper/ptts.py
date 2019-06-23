@@ -16,6 +16,7 @@ def initialize():
     global tt_target_user
     global tt_target_id
     global tt_active_user
+    global tt_target_hashtag
     global dl_path
     global cookies_path
     global args
@@ -26,6 +27,7 @@ def initialize():
     tt_password = None
     tt_target_user = None
     tt_target_id = None
+    tt_target_hashtag = None
     tt_active_user = {}
     dl_path = os.getcwd()
     cookies_path = os.path.join(os.getcwd(), 'cookies')

@@ -228,3 +228,137 @@ def download_live(target_room_id):
     # else:
     #     logger.info("There is no available livestream for this user.")
     #     logger.separator()
+
+
+
+def download_hashtag(target_user_hashtag):
+    try:
+        max_cursor = 0
+        has_more = 0
+        downloaded_total = 0
+        checked_total = 0
+        available_total = 0
+        current_feed_page = 1
+        hashtag_id = None
+        target_user_hashtag = "#" + target_user_hashtag
+
+        if not os.path.exists(os.path.join(ptts.dl_path, target_user_hashtag)):
+            os.makedirs(os.path.join(ptts.dl_path, target_user_hashtag))
+
+        download_path = os.path.join(ptts.dl_path, target_user_hashtag)
+        while True:
+            if ptts.args.recent:
+                logger.separator()
+                logger.binfo("Only checking the first 10 videos (--recent was passed).")
+            if not has_more and not max_cursor:
+                logger.separator()
+                logger.info("Retrieving first feed page (page {:d})".format(current_feed_page))
+                logger.separator()
+            if not hashtag_id:
+                json_data = api.hashtag_search(text=ptts.tt_target_hashtag)
+                hashtag_id = json_data.get("challenge_list")[0].get("challenge_info").get("cid")
+                logger.info("Got hashtag Id: " + hashtag_id)
+            json_data = api.hashtag_feed(hashtag_id=hashtag_id, cursor=max_cursor)
+            open("hashtag.json", 'w').write(json.dumps(json_data))
+            max_cursor = json_data.get('cursor')
+            has_more = json_data.get('has_more')
+            if not json_data.get("aweme_list", None):
+                if checked_total:
+                    logger.separator()
+                    logger.info("End of feed reached. {:d} {:s} been downloaded.".format(
+                        downloaded_total, "video has" if downloaded_total == 1 else "videos have"))
+                elif not checked_total:
+                    logger.info("There are no available videos to download.")
+                logger.separator()
+                break
+            else:
+                current_feed_page += 1
+                available_total += len(json_data.get("aweme_list")) if not ptts.args.recent else 10
+                for video in json_data.get("aweme_list"):
+                    if ptts.args.recent and checked_total == 10:
+                        if downloaded_total:
+                            logger.separator()
+                            logger.info("10 videos have been checked. {:d} {:s} been downloaded.".format(
+                                downloaded_total, "video has" if downloaded_total == 1 else "videos have"))
+                        else:
+                            logger.info("10 videos have been checked. There are no available videos to download.")
+                        logger.separator()
+                        return
+                    else:
+                        video_uri = video.get("video").get("play_addr").get("uri")
+                        video_desc = video.get("desc")
+                        filename = '{:d}_{:s}.mp4'.format(video.get("create_time"), video.get("author").get("unique_id"))
+                        if video_uri.isdigit():
+                            actual_video_uri = video.get("video").get("play_addr").get("url_list")[0]
+                            if not os.path.isfile(os.path.join(download_path, filename)):
+
+                                rr = requests.get(actual_video_uri, verify=True)
+                                if rr.status_code == 200:
+                                    open(os.path.join(download_path, filename), 'wb').write(rr.content)
+                                    try:
+                                        mp4_video_tags = MP4(os.path.join(download_path, filename))
+                                        mp4_video_tags['\xa9cmt'] = video_desc
+                                        mp4_video_tags.save()
+                                    except Exception as e:
+                                        pass
+                                    logger.info(
+                                        "({:d}/{:d}) - Downloaded video with Id: {}".format(checked_total + 1,
+                                                                                            available_total,
+                                                                                            video_uri))
+                                    downloaded_total += 1
+                                else:
+                                    logger.warn("Response did not return status 200, was {:d} instead. Giving up and "
+                                                "moving on.".format(rr.status_code))
+                                    logger.warn("The video Id was: {:s}".format(video_uri))
+                            else:
+                                logger.info("({:d}/{:d}) - Already downloaded video with Id: {}".format(checked_total + 1,
+                                                                                                        available_total,
+                                                                                                        video_uri))
+                        else:
+                            if not os.path.isfile(os.path.join(download_path, filename)):
+                                rr = requests.get(Constants.VIDEO_BASE_URL.format(video_uri, 1), verify=True, headers=Constants.REQUESTS_VIDEO_UA)
+                                if rr.status_code == 200:
+                                    open(os.path.join(download_path, filename), 'wb').write(rr.content)
+                                    try:
+                                        mp4_video_tags = MP4(os.path.join(download_path, filename))
+                                        mp4_video_tags['\xa9cmt'] = video_desc
+                                        mp4_video_tags.save()
+                                    except Exception as e:
+                                        pass
+                                    logger.info(
+                                        "({:d}/{:d}) - Downloaded video with Id: {}".format(checked_total + 1,
+                                                                                            available_total,
+                                                                                            video_uri))
+                                    downloaded_total += 1
+                                else:
+                                    logger.warn("Response did not return status 200, was {:d} instead. Trying with "
+                                                "lower bitrate.".format(rr.status_code))
+                                    rr = requests.get(Constants.VIDEO_BASE_URL.format(video_uri, 0), verify=True, headers=Constants.REQUESTS_VIDEO_UA)
+                                    if rr.status_code == 200:
+                                        open(os.path.join(download_path, filename), 'wb').write(rr.content)
+                                        logger.info(
+                                            "({:d}/{:d}) - Downloaded video with Id: {}".format(checked_total + 1,
+                                                                                                available_total,
+                                                                                                video_uri))
+                                        downloaded_total += 1
+                                    else:
+                                        logger.warn("Response did not return status 200, was {:d} instead. Giving up "
+                                                    "and moving on.".format(rr.status_code))
+                                        logger.warn("The video Id was: {:s}".format(video_uri))
+                            else:
+                                logger.info("({:d}/{:d}) - Already downloaded video with Id: {}".format(checked_total + 1,
+                                                                                                        available_total,
+                                                                                                        video_uri))
+                        checked_total += 1
+                if has_more:
+                    logger.separator()
+                    logger.info("Retrieving next feed page (page {:d})".format(current_feed_page))
+                    logger.separator()
+    except KeyboardInterrupt:
+        logger.separator()
+        logger.info("The download has been aborted.")
+        logger.separator()
+    except Exception as e:
+        logger.separator()
+        logger.error("Something went wrong: " + str(e))
+        logger.separator()

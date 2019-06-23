@@ -49,6 +49,8 @@ def validate_inputs(config, args):
 
         if args.download:
             ptts.tt_target_user = args.download
+        elif args.hashtag:
+            ptts.tt_target_hashtag = args.hashtag
         elif args.getfollowing:
             ptts.tt_target_user = args.getfollowing
         elif args.livestream:
@@ -77,6 +79,8 @@ def run():
                                                                                     Constants.PYTHON_VER))
     parser.add_argument('-d', '--download', dest='download', type=str, required=False,
                         help="The username (or uid) of the user whose posts you want to save.")
+    parser.add_argument('-ht', '--hashtag', dest='hashtag', type=str, required=False,
+                        help="The hashtag whose posts in the feed you want to save.")
     parser.add_argument('-r', '--recent', dest='recent', action='store_true',
                         help="When used, only retrieves the first 10 videos in the user's feed.")
     parser.add_argument('-gf', '--get-following', dest='getfollowing', type=str, required=False,
@@ -166,6 +170,9 @@ def run():
         if ptts.args.download:
             logger.info("Starting download of all videos from profile.")
             downloader.download_all(ptts.tt_target_id)
+        if ptts.args.hashtag:
+            logger.info("Starting download of all posts from hashtag '{:s}'.".format(ptts.tt_target_hashtag))
+            downloader.download_hashtag(ptts.tt_target_hashtag)
         elif ptts.args.livestream:
             logger.info("Starting download for livestream.")
             if ptts.tt_target_user_liveroomid:
