@@ -95,14 +95,14 @@ def run():
 
     if validate_inputs(config, args):
         api.login()
-        if args.download or args.livestream and not args.isuid:
+        if args.download and not args.isuid:
             try:
                 target_user_json = api.search_user(ptts.tt_target_user)
-                open('feed.json', 'w').write(json.dumps(target_user_json))
                 for user in target_user_json.get('user_list'):
                     if user.get('user_info').get('unique_id') == ptts.tt_target_user:
                         ptts.tt_target_id = user.get('user_info').get('uid')
-                        ptts.tt_target_user_liveroomid = user.get('user_info').get('room_id') if user.get('user_info').get('room_id') > 0 else None
+                        response_user = api.get_user_info(ptts.tt_target_id)
+                        ptts.tt_target_user_liveroomid = response_user.get('user').get('room_id') if response_user.get('user').get('room_id') > 0 else None
                         video_count = user.get('user_info').get('aweme_count')
                         logger.info("Found matching user profile with {:d} videos."
                                     .format(video_count))
@@ -114,7 +114,6 @@ def run():
                 if not ptts.tt_target_id:
                     raise IndexError
             except (IndexError, TypeError):
-                logger.separator()
                 logger.error("No user found matching '{:s}', trying tiktokapi.ga search.".format(ptts.tt_target_user))
                 logger.separator()
                 try:
@@ -122,6 +121,7 @@ def run():
                     if target_user_json:
                         for user in target_user_json.get('user_list'):
                             if user.get('user_info').get('unique_id') == ptts.tt_target_user:
+                                open("usersearch.json", "w").write(json.dumps(user.get("user_info")))
                                 ptts.tt_target_id = user.get('user_info').get('uid')
                                 ptts.tt_target_user_liveroomid = user.get('user_info').get('room_id') if user.get('user_info').get('room_id') > 0 else None
                                 video_count = user.get('user_info').get('aweme_count')
@@ -142,13 +142,23 @@ def run():
                     logger.separator()
                     sys.exit(0)
         elif args.download and args.isuid:
-            ptts.tt_target_id = args.livestream or args.download
+            ptts.tt_target_id = args.download
             try:
                 int(ptts.tt_target_id)
             except ValueError:
                 logger.error("The user ID '{}' is not a valid value. Exiting.".format(ptts.tt_target_id))
                 logger.separator()
                 sys.exit(1)
+        elif args.livestream and args.isuid:
+            ptts.tt_target_id = args.livestream
+            try:
+                int(ptts.tt_target_id)
+            except ValueError:
+                logger.error("The user ID '{}' is not a valid value. Exiting.".format(ptts.tt_target_id))
+                logger.separator()
+                sys.exit(1)
+            response_user = api.get_user_info(ptts.tt_target_id)
+            ptts.tt_target_user_liveroomid = response_user.get('user').get('room_id') if response_user.get('user').get('room_id') > 0 else None
         if ptts.tt_target_id:
             logger.info("Retrieved user ID: {:s}".format(ptts.tt_target_id))
             logger.separator()  
@@ -173,12 +183,12 @@ def run():
         if ptts.args.hashtag:
             logger.info("Starting download of all posts from hashtag '{:s}'.".format(ptts.tt_target_hashtag))
             downloader.download_hashtag(ptts.tt_target_hashtag)
-        elif ptts.args.livestream:
-            logger.info("Starting download for livestream.")
+        if ptts.args.livestream:
             if ptts.tt_target_user_liveroomid:
+                logger.info("Starting download for livestream.")
                 downloader.download_live(ptts.tt_target_user_liveroomid)
             else:
-                logger.warn("SHIIIEEEET NIGGA THERE BE NO LIVE STREAM RIGHT NOW")
+                logger.warn("There currently no ongoing livestream available.")
                 logger.separator()
 
 

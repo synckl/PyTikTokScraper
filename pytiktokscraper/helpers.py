@@ -109,11 +109,13 @@ def make_request(url, posts=None, request_type=None):
         headers = {
             "Accept-Encoding": "gzip",
             "sdk-version": "1",
-            "Cookie": "cookies",
-            "x-tt-token": "03aa7fe52bf9eae34e66d2ae1aae56a9d198947aaffbdfe62122332ef637fea45596abd9673d432a9876e4eeb55248c1e40",
+            "Cookie": cookies,
+            'X-SS-REQ-TICKET': '1541500434739',
+            'X-SS-TC': '0',
+            "x-tt-token": "002447bd7d6a5c792cb223b1151e399e0402e5fdcf768ab9f96930b63dc169d353480340ec7abaa1856d8133dcfe12363b42",
             "Host": url_parse.netloc,
             "Connection": "Keep-Alive",
-            "User-Agent": "okhttp/3.10.0.1",
+            "User-Agent": "com.ss.android.ugc.trill/584 (Linux; U; Android 5.1.1; en_US; LG-H961N;",
         }
 
         if request_type:
@@ -127,6 +129,25 @@ def make_request(url, posts=None, request_type=None):
         logger.error("An error occurred: {}".format(str(e)))
         return None
 
+def make_request_tta(url, posts=None, request_type=None):
+    try:
+        headers = {
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+            "accept-encoding": "gzip, deflate, br",
+            "user-agent": Constants.REQUESTS_VIDEO_UA.get("User-Agent"),
+            "cache-control": "max-age=0",
+        }
+
+        if request_type:
+            if request_type == "post":
+                return requests.post(url, headers=headers, data=posts, timeout=5)
+            elif request_type == "get":
+                return requests.get(url, headers=headers, timeout=5)
+        else:
+            raise Exception("Missing request type. Must be GET or POST.")
+    except Exception as e:
+        logger.error("An error occurred: {}".format(str(e)))
+        return None
 
 def get_timestamp():
     return int(round(time.time() * 1000))

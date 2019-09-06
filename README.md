@@ -19,7 +19,7 @@ Use `--recent` alongside `--download` or `--hashtag` to only download the most r
 
 Use `--single` to download a video with a given Id as argument (e.g. `--single 3e7da006d9234b198b554a0eb7a0b86f`)
 
-Use `--livestream` to download an user's ongoing livestream. Requires user ID for now. (e.g. `--livestream 6697557965282691846`). This feature is untested.
+Use `--livestream` to download an user's ongoing livestream. Accepts both username and uid as input (If using uid as input you must also pass `-uid`). This feature is untested.
 
 Create a file called `settings.ini` in the repository folder with the following format:
 
