@@ -95,7 +95,7 @@ def run():
 
     if validate_inputs(config, args):
         api.login()
-        if args.download and not args.isuid:
+        if args.download or args.livestream and not args.isuid:
             try:
                 target_user_json = api.search_user(ptts.tt_target_user)
                 for user in target_user_json.get('user_list'):
